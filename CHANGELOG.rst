@@ -2,9 +2,10 @@
 Changelog
 =========
 
-Version 0.1
+Version 0.0.1
 ===========
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+- Bare minimum functionality
+- Executes notebook
+- Exports notebook to html
+- Attaches environment.yml and .ipynb to html

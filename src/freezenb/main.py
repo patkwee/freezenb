@@ -18,6 +18,7 @@ Note: This skeleton file can be safely removed if not needed!
 import argparse
 import sys
 import logging
+from . import convert
 
 from freezenb import __version__
 
@@ -26,22 +27,6 @@ __copyright__ = "Patrick Kwee"
 __license__ = "mit"
 
 _logger = logging.getLogger(__name__)
-
-
-def fib(n):
-    """Fibonacci example function
-
-    Args:
-      n (int): integer
-
-    Returns:
-      int: n-th Fibonacci number
-    """
-    assert n > 0
-    a, b = 1, 1
-    for i in range(n-1):
-        a, b = b, a+b
-    return a
 
 
 def parse_args(args):
@@ -54,16 +39,17 @@ def parse_args(args):
       :obj:`argparse.Namespace`: command line parameters namespace
     """
     parser = argparse.ArgumentParser(
-        description="Just a Fibonacci demonstration")
+        description="Execute and convert a jupyter notebook to html")
     parser.add_argument(
         "--version",
         action="version",
         version="freezenb {ver}".format(ver=__version__))
     parser.add_argument(
-        dest="n",
-        help="n-th Fibonacci number",
-        type=int,
-        metavar="INT")
+        dest="filename",
+        help="Jupyter notebook filename")
+    parser.add_argument(
+        dest="out",
+        help="Output filename without extension")
     parser.add_argument(
         "-v",
         "--verbose",
@@ -101,7 +87,7 @@ def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
     _logger.debug("Starting crazy calculations...")
-    print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
+    convert.convert(args.filename, args.out)
     _logger.info("Script ends here")
 
 
