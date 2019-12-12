@@ -86,9 +86,7 @@ def main(args):
     """
     args = parse_args(args)
     setup_logging(args.loglevel)
-    _logger.debug("Starting crazy calculations...")
     convert.convert(args.filename, args.out)
-    _logger.info("Script ends here")
 
 
 def run():
