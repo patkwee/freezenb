@@ -6,6 +6,8 @@ from nbformat.v4 import new_markdown_cell
 import base64
 import copy
 import os
+import datetime
+import math
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -71,7 +73,69 @@ def create_embedded_link(filename, data, mediatype='text/plain'):
     return f"<a download='{filename}' href='{data_uri}'>{filename}</a>"
 
 
-def convert(input_fn, output_fn):
+def build_output_filename(input_fn, outext='.html'):
+    """Find next unused output filename
+    
+    Uses v{int} suffix to find next unused output filename.
+    
+    Arguments:
+        input_fn {str} -- input filename
+    
+    Keyword Arguments:
+        outext {str} -- extension of output filename (default: {'.html'})
+    
+    Returns:
+        str -- output filename
+    """
+
+    fn, ext = os.path.splitext(input_fn)
+    i = 1
+    while os.path.exists(f'{fn} v{i}{outext}'):
+        i += 1
+
+    return f'{fn} v{i}{outext}'
+
+
+def pretty_duration(d):
+    """Formats a time duration
+    
+    Formats a time duration in a human readable format
+    
+    Arguments:
+        d {float} -- Duration in seconds
+    
+    Returns:
+        str -- formated duration
+    """
+
+    if d < 1:
+        return "<1s"
+
+    s = ''
+    
+    days = math.floor(d / 86400)
+    if days:
+        s += f'{days}d '
+    d = d % 86400
+
+    hours = math.floor(d / 3600)
+    if days or hours:
+        s += f'{hours}h '
+    d = d % 3600
+
+    mins = math.floor(d / 60)
+    if days or hours or mins:
+        s += f'{mins}m '
+    d = d % 60
+
+    secs = round(d)
+    if not days:
+        s += f'{secs}s'
+
+    return s.strip()
+
+
+def convert(input_fn, output_fn=None):
     """Execute and save notebook as html
     
     Executes notebook, extracts packagelist and saves everything to html
@@ -88,8 +152,13 @@ def convert(input_fn, output_fn):
     # Execute notebook
     _logger.info(f'Executing notebook...')
     ep = ExecutePreprocessor(timeout=-1)
+    starttime = datetime.datetime.today()
     ep.preprocess(nb)
+    endtime = datetime.datetime.today()
     _logger.info(f'Executed notebook')
+
+    timestamp = "Executed {} in {}.".format(starttime.strftime('%Y-%m-%d %H:%M:%S'), 
+        pretty_duration((endtime-starttime).total_seconds()))
 
     # Extract .ipynb file
     scrubbed_nb = scrub_output(copy.deepcopy(nb))
@@ -105,7 +174,7 @@ def convert(input_fn, output_fn):
         packages_link = ''
 
     # Add files / links
-    md = f"---\n {ipynb_link} {packages_link}"
+    md = f"---\n {timestamp} {ipynb_link} {packages_link}"
     nb['cells'].append(new_markdown_cell(md))
 
     # Export to html
@@ -113,7 +182,11 @@ def convert(input_fn, output_fn):
     exporter = HTMLExporter()
     (body, resources) = exporter.from_notebook_node(nb)
 
+    if not output_fn:
+        output_fn = build_output_filename(input_fn)
+
     writer = FilesWriter()
+    resources['output_extension'] = None
     writer.write(output=body, resources=resources, notebook_name=output_fn)
 
     _logger.info(f'Finished')

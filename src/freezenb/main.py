@@ -49,7 +49,9 @@ def parse_args(args):
         help="Jupyter notebook filename")
     parser.add_argument(
         dest="out",
-        help="Output filename without extension")
+        nargs='?',
+        default=None,
+        help="Output filename")
     parser.add_argument(
         "-v",
         "--verbose",
