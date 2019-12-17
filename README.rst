@@ -16,20 +16,37 @@ Jupyter nbconvert is used to execute and convert the notebook.
 
 Install
 -------
-Install from test.pypi
+You can install the package directly from github via pip:
     
-    pip install --index-url https://test.pypi.org/simple/ freezenb
+    conda install git pip
+    pip install git+https://github.com/patkwee/freezenb
 
 
-Use
----
-The commend 'freezenb' will be installed in your environment.
 
-  freezenb my_notebook.ipynb my_notebook
+Usage from command line
+-----------------------
+The command 'freezenb' will be installed in your environment.
+
+    $ freezenb --help
+    usage: freezenb [-h] [--version] [-v] [-vv] filename [out]
+
+    Execute and convert a jupyter notebook to html
+
+    positional arguments:
+      filename             Jupyter notebook filename
+      out                  Output filename
+
+    optional arguments:
+      -h, --help           show this help message and exit
+      --version            show program's version number and exit
+      -v, --verbose        set loglevel to INFO
+      -vv, --very-verbose  set loglevel to DEBUG
+
+To convert the notebook 'my_notebook.ipynb' run:
+
+    $ freezenb my_notebook.ipynb
 
 
-Note
-====
-
-This project has been set up using PyScaffold 3.2.2. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+Documentation
+-------------
+See https://freezenb.readthedocs.io
